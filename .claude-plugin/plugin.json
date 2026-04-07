@@ -1,5 +1,5 @@
 {
-  "name": "claude-hud-glm",
+  "name": "claude-hud",
   "description": "给claude-hud加上glm用量显示",
   "version": "0.0.12",
   "author": {

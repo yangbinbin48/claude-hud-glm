@@ -11,7 +11,13 @@ expand
   Context ░░░░░░░░░░ 0%
   GLM │ 5h: ██░░░░░░░░ 22% 20:10 │ MCP: ████░░░░░░ 41% 04-28 17:42
 ```
-
+## 安装
+```
+# 添加市场
+claude plugin marketplace add sandxin/claude-hud-glm
+# 安装插件
+claude plugin install claude-hud
+```
 ## 配置
 方式一
 ```
