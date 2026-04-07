@@ -1,5 +1,5 @@
 {
-  "name": "claude-hud-glm",
+  "name": "claude-hud",
   "version": "0.0.12",
   "description": "给claude-hud加上glm用量显示",
   "type": "module",
