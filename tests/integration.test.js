@@ -50,11 +50,17 @@ test("CLI renders expected output for a basic transcript", async (t) => {
       cwd: projectDir,
     });
 
+    const { ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN, ...cleanEnv } = process.env;
     const result = spawnSync("node", ["dist/index.js"], {
       cwd: path.resolve(process.cwd()),
       input: stdin,
       encoding: "utf8",
-      env: { ...process.env, HOME: homeDir, LANG: "C" },
+      env: {
+        ...cleanEnv,
+        HOME: homeDir,
+        LANG: "C",
+        CLAUDE_CONFIG_DIR: homeDir,
+      },
     });
 
     if (skipIfSpawnBlocked(result, t)) return;
