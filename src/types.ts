@@ -70,6 +70,17 @@ export interface UsageData {
   sevenDayResetAt: Date | null;
 }
 
+export interface GlmUsageData {
+  isGlm: true;
+  tokensPercent: number;       // 0-100
+  mcpPercent: number;          // 0-100
+  mcpCurrentUsage: number | null;
+  mcpTotal: number | null;
+  tokenResetAt: Date | null;
+  mcpResetAt: Date | null;
+  fetchedAt: number;           // Unix ms
+}
+
 export interface MemoryInfo {
   totalBytes: number;
   usedBytes: number;
@@ -108,6 +119,7 @@ export interface RenderContext {
   sessionDuration: string;
   gitStatus: GitStatus | null;
   usageData: UsageData | null;
+  glmUsage: GlmUsageData | null;
   memoryUsage: MemoryInfo | null;
   config: HudConfig;
   extraLabel: string | null;

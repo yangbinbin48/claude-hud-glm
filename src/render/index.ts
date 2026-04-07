@@ -377,6 +377,7 @@ function renderExpanded(ctx: RenderContext, terminalWidth: number | null = null)
   const elementOrder = ctx.config?.elementOrder ?? DEFAULT_ELEMENT_ORDER;
   const seen = new Set<HudElement>();
   const lines: Array<{ line: string; isActivity: boolean }> = [];
+  const shouldKeepUsageSeparate = !!ctx.glmUsage?.isGlm;
 
   for (let index = 0; index < elementOrder.length; index += 1) {
     const element = elementOrder[index];
@@ -386,8 +387,11 @@ function renderExpanded(ctx: RenderContext, terminalWidth: number | null = null)
 
     const nextElement = elementOrder[index + 1];
     if (
+      !shouldKeepUsageSeparate
+      && (
       (element === 'context' && nextElement === 'usage' && !seen.has('usage'))
       || (element === 'usage' && nextElement === 'context' && !seen.has('context'))
+      )
     ) {
       seen.add(element);
       seen.add(nextElement);

@@ -3,6 +3,7 @@ import { isLimitReached } from '../types.js';
 import { getContextPercent, getBufferedPercent, getModelName, formatModelName, getProviderLabel, getTotalTokens } from '../stdin.js';
 import { getOutputSpeed } from '../speed-tracker.js';
 import { coloredBar, critical, git as gitColor, gitBranch as gitBranchColor, label, model as modelColor, project as projectColor, getContextColor, getQuotaColor, quotaBar, custom as customColor, RESET } from './colors.js';
+import { formatGlmUsageParts } from './glm-usage.js';
 import { getAdaptiveBarWidth } from '../utils/terminal.js';
 import { renderCostEstimate } from './lines/cost.js';
 import { t } from '../i18n/index.js';
@@ -155,7 +156,9 @@ export function renderSessionLine(ctx: RenderContext): string {
       const effectiveUsage = Math.max(fiveHour ?? 0, sevenDay ?? 0);
 
       if (effectiveUsage >= usageThreshold) {
-        const usageBarEnabled = display?.usageBarEnabled ?? true;
+        const usageBarEnabled = ctx.config.lineLayout === 'compact'
+          ? false
+          : (display?.usageBarEnabled ?? true);
         if (fiveHour === null && sevenDay !== null) {
           const weeklyOnlyPart = formatUsageWindowPart({
             label: t('label.weekly'),
@@ -204,6 +207,25 @@ export function renderSessionLine(ctx: RenderContext): string {
     const total = st.inputTokens + st.outputTokens + st.cacheCreationTokens + st.cacheReadTokens;
     if (total > 0) {
       parts.push(label(`tok: ${formatTokens(total)} (in: ${formatTokens(st.inputTokens)}, out: ${formatTokens(st.outputTokens)})`, colors));
+    }
+  }
+
+  // GLM usage display
+  if (ctx.glmUsage?.isGlm) {
+    const glmParts = formatGlmUsageParts({
+      glm: ctx.glmUsage,
+      colors,
+      barWidth,
+      usageBarEnabled: false,
+      showGlmTokenUsage: display?.showGlmTokenUsage !== false,
+      showGlmMcpUsage: display?.showGlmMcpUsage !== false,
+      decorateLabelText: text => label(text, colors),
+    });
+
+    if (glmParts.length > 0) {
+      const [firstGlmPart, ...remainingGlmParts] = glmParts;
+      parts.push(`${label('GLM', colors)} ${firstGlmPart}`);
+      parts.push(...remainingGlmParts);
     }
   }
 

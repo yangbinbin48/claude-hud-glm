@@ -92,6 +92,8 @@ export interface HudConfig {
     showMemoryUsage: boolean;
     showSessionTokens: boolean;
     showOutputStyle: boolean;
+    showGlmTokenUsage: boolean;
+    showGlmMcpUsage: boolean;
     autocompactBuffer: AutocompactBufferMode;
     usageThreshold: number;
     sevenDayThreshold: number;
@@ -137,6 +139,8 @@ export const DEFAULT_CONFIG: HudConfig = {
     showMemoryUsage: false,
     showSessionTokens: false,
     showOutputStyle: false,
+    showGlmTokenUsage: true,
+    showGlmMcpUsage: true,
     autocompactBuffer: 'enabled',
     usageThreshold: 0,
     sevenDayThreshold: 80,
@@ -371,6 +375,12 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     showOutputStyle: typeof migrated.display?.showOutputStyle === 'boolean'
       ? migrated.display.showOutputStyle
       : DEFAULT_CONFIG.display.showOutputStyle,
+    showGlmTokenUsage: typeof migrated.display?.showGlmTokenUsage === 'boolean'
+      ? migrated.display.showGlmTokenUsage
+      : DEFAULT_CONFIG.display.showGlmTokenUsage,
+    showGlmMcpUsage: typeof migrated.display?.showGlmMcpUsage === 'boolean'
+      ? migrated.display.showGlmMcpUsage
+      : DEFAULT_CONFIG.display.showGlmMcpUsage,
     autocompactBuffer: validateAutocompactBuffer(migrated.display?.autocompactBuffer)
       ? migrated.display.autocompactBuffer
       : DEFAULT_CONFIG.display.autocompactBuffer,

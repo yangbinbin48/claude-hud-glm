@@ -59,6 +59,7 @@ test("main logs an error when dependencies throw", async () => {
     }),
     getGitBranch: async () => null,
     getUsage: async () => null,
+    getGlmUsage: async () => null,
     render: () => {},
     now: () => Date.now(),
     log: (...args) => logs.push(args.join(" ")),
@@ -82,6 +83,7 @@ test("main logs unknown error for non-Error throws", async () => {
     }),
     getGitBranch: async () => null,
     getUsage: async () => null,
+    getGlmUsage: async () => null,
     render: () => {},
     now: () => Date.now(),
     log: (...args) => logs.push(args.join(" ")),
@@ -152,7 +154,8 @@ test("main executes the happy path with default dependencies", async () => {
       }),
       getGitBranch: async () => null,
       getUsage: async () => null,
-      render: (ctx) => {
+      getGlmUsage: async () => null,
+    render: (ctx) => {
         renderedContext = ctx;
       },
     });
@@ -220,6 +223,7 @@ test("main includes git status in render context", async () => {
         environmentThreshold: 0,
       },
     }),
+    getGlmUsage: async () => null,
     render: (ctx) => {
       renderedContext = ctx;
     },
@@ -251,6 +255,7 @@ test("main includes usageData in render context", async () => {
       hooksCount: 0,
     }),
     getGitBranch: async () => null,
+    getGlmUsage: async () => null,
     render: (ctx) => {
       renderedContext = ctx;
     },
@@ -283,6 +288,7 @@ test("main uses stdin-native rate_limits when available", async () => {
       hooksCount: 0,
     }),
     getGitStatus: async () => null,
+    getGlmUsage: async () => null,
     render: (ctx) => {
       renderedContext = ctx;
     },
@@ -315,6 +321,7 @@ test("main leaves usageData null when stdin rate_limits are absent", async () =>
       hooksCount: 0,
     }),
     getGitStatus: async () => null,
+    getGlmUsage: async () => null,
     render: (ctx) => {
       renderedContext = ctx;
     },
@@ -378,6 +385,7 @@ test("main includes Claude Code version in render context only when enabled", as
       lookupCalls += 1;
       return "2.1.81";
     },
+    getGlmUsage: async () => null,
     render: (ctx) => {
       renderedContext = ctx;
     },
@@ -441,6 +449,7 @@ test("main skips Claude Code version lookup when disabled", async () => {
       lookupCalls += 1;
       return "2.1.81";
     },
+    getGlmUsage: async () => null,
     render: () => {},
   });
 
@@ -508,6 +517,7 @@ test("main includes memoryUsage in render context only for expanded layout when 
       lookupCalls += 1;
       return mockMemoryUsage;
     },
+    getGlmUsage: async () => null,
     render: (ctx) => {
       renderedContext = ctx;
     },
@@ -571,6 +581,7 @@ test("main skips memoryUsage lookup for compact layout even when enabled", async
       lookupCalls += 1;
       return null;
     },
+    getGlmUsage: async () => null,
     render: () => {},
   });
 

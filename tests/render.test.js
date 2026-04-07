@@ -43,6 +43,7 @@ function baseContext() {
     sessionDuration: '',
     gitStatus: null,
     usageData: null,
+    glmUsage: null,
     memoryUsage: null,
     config: {
       lineLayout: 'compact',
@@ -1275,6 +1276,55 @@ test('renderUsageLine shows 7d reset countdown in bar mode when above threshold'
   assert.ok(line.includes('|'), `should render both usage windows above the threshold: ${line}`);
 });
 
+test('renderSessionLine shows GLM 5h reset countdown', () => {
+  const ctx = baseContext();
+  const resetTime = new Date(Date.now() + 90 * 60000);
+  const mcpResetTime = new Date(Date.now() + 30 * 24 * 60 * 60000);
+  ctx.glmUsage = {
+    isGlm: true,
+    tokensPercent: 64,
+    mcpPercent: 12,
+    mcpCurrentUsage: 12,
+    mcpTotal: 100,
+    tokenResetAt: resetTime,
+    mcpResetAt: mcpResetTime,
+    fetchedAt: Date.now(),
+  };
+
+  const line = stripAnsi(renderSessionLine(ctx));
+  assert.equal(line.match(/GLM/g)?.length, 1, `should not duplicate GLM label: ${line}`);
+  assert.ok(line.includes('5h:'), `should render GLM 5h usage: ${line}`);
+  assert.ok(line.includes('MCP:'), `should render MCP window label: ${line}`);
+  assert.ok(!line.includes('██'), `compact mode should not render GLM bars: ${line}`);
+  assert.ok(!line.includes('reset'), `should omit reset label: ${line}`);
+  assert.match(line, /5h: 64% \d{2}:\d{2}/, `should include compact GLM reset time: ${line}`);
+});
+
+test('renderUsageLine shows GLM 5h reset countdown', () => {
+  const ctx = baseContext();
+  const resetTime = new Date(Date.now() + 2 * 60 * 60000);
+  const mcpResetTime = new Date(Date.now() + 3 * 24 * 60 * 60000);
+  ctx.glmUsage = {
+    isGlm: true,
+    tokensPercent: 82,
+    mcpPercent: 20,
+    mcpCurrentUsage: 20,
+    mcpTotal: 100,
+    tokenResetAt: resetTime,
+    mcpResetAt: mcpResetTime,
+    fetchedAt: Date.now(),
+  };
+
+  const line = stripAnsi(renderUsageLine(ctx));
+  assert.ok(line.includes('GLM'), `should render GLM usage line: ${line}`);
+  assert.ok(line.includes('5h:'), `should render GLM 5h usage: ${line}`);
+  assert.ok(line.includes('MCP:'), `should render MCP window label: ${line}`);
+  assert.ok(line.includes('██'), `expanded usage line should still render GLM bars: ${line}`);
+  assert.ok(!line.includes('reset'), `should omit reset label: ${line}`);
+  assert.ok(!line.includes('(20/100)'), `should omit MCP current/total: ${line}`);
+  assert.match(line, /MCP: .* (\d{2}:\d{2}|\d{2}-\d{2} \d{2}:\d{2})/, `should include GLM reset time: ${line}`);
+});
+
 test('renderUsageLine shows weekly-only usage without a ghost 5h section', () => {
   const ctx = baseContext();
   ctx.config.display.sevenDayThreshold = 80;
@@ -1798,6 +1848,31 @@ test('render expanded layout keeps usage and context separate when not adjacent'
   assert.ok(usageLine, 'usage should render on its own line');
   assert.ok(contextLine, 'context should render on its own line');
   assert.equal(combinedLine, undefined, 'usage and context should not combine when separated by another element');
+});
+
+test('render expanded layout keeps GLM usage separate from context even when adjacent', () => {
+  const ctx = baseContext();
+  ctx.config.lineLayout = 'expanded';
+  ctx.config.elementOrder = ['usage', 'context'];
+  ctx.glmUsage = {
+    isGlm: true,
+    tokensPercent: 64,
+    mcpPercent: 12,
+    mcpCurrentUsage: 12,
+    mcpTotal: 100,
+    tokenResetAt: new Date(Date.now() + 90 * 60000),
+    mcpResetAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    fetchedAt: Date.now(),
+  };
+
+  const lines = captureRenderLines(ctx);
+  const glmLine = lines.find(line => line.includes('GLM'));
+  const contextLine = lines.find(line => line.includes('Context'));
+  const combinedLine = lines.find(line => line.includes('GLM') && line.includes('Context'));
+
+  assert.ok(glmLine, 'GLM usage should render on its own line');
+  assert.ok(contextLine, 'context should render on its own line');
+  assert.equal(combinedLine, undefined, 'GLM usage and context should not combine when adjacent');
 });
 
 test('render compact layout keeps activity lines even when elementOrder omits them', () => {

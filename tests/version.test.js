@@ -29,14 +29,14 @@ afterEach(() => {
   _setVersionInvocationEnvForTests(null, null);
 });
 
-test('_parseClaudeCodeVersion preserves prerelease and build suffixes', () => {
+test('_parseClaudeCodeVersion preserves prerelease and build suffixes', { concurrency: false }, () => {
   assert.equal(_parseClaudeCodeVersion('2.1.81 (Claude Code)\n'), '2.1.81');
   assert.equal(_parseClaudeCodeVersion('2.2.0-beta.1 (Claude Code)\n'), '2.2.0-beta.1');
   assert.equal(_parseClaudeCodeVersion('Claude Code 2.2.0-beta.1+abc123'), '2.2.0-beta.1+abc123');
   assert.equal(_parseClaudeCodeVersion(''), undefined);
 });
 
-test('_getClaudeVersionInvocation executes binaries directly on non-Windows', () => {
+test('_getClaudeVersionInvocation executes binaries directly on non-Windows', { concurrency: false }, () => {
   const invocation = _getClaudeVersionInvocation('/usr/local/bin/claude', 'linux');
   assert.deepEqual(invocation, {
     file: '/usr/local/bin/claude',
@@ -44,7 +44,7 @@ test('_getClaudeVersionInvocation executes binaries directly on non-Windows', ()
   });
 });
 
-test('_getClaudeVersionInvocation wraps .cmd launches through COMSPEC on Windows', () => {
+test('_getClaudeVersionInvocation wraps .cmd launches through COMSPEC on Windows', { concurrency: false }, () => {
   const invocation = _getClaudeVersionInvocation(
     'C:\\Program Files\\Claude\\claude.cmd',
     'win32',
@@ -56,7 +56,7 @@ test('_getClaudeVersionInvocation wraps .cmd launches through COMSPEC on Windows
   });
 });
 
-test('_getClaudeVersionInvocation executes .exe paths directly on Windows', () => {
+test('_getClaudeVersionInvocation executes .exe paths directly on Windows', { concurrency: false }, () => {
   const invocation = _getClaudeVersionInvocation('C:\\Claude\\claude.exe', 'win32');
   assert.deepEqual(invocation, {
     file: 'C:\\Claude\\claude.exe',
@@ -64,7 +64,7 @@ test('_getClaudeVersionInvocation executes .exe paths directly on Windows', () =
   });
 });
 
-test('getClaudeCodeVersion persists cache across process resets under CLAUDE_CONFIG_DIR', async () => {
+test('getClaudeCodeVersion persists cache across process resets under CLAUDE_CONFIG_DIR', { concurrency: false }, async () => {
   const tempHome = await mkdtemp(path.join(tmpdir(), 'claude-hud-version-'));
   const customConfigDir = path.join(tempHome, '.claude-alt');
   const binaryPath = path.join(tempHome, 'claude');
@@ -118,7 +118,7 @@ test('getClaudeCodeVersion persists cache across process resets under CLAUDE_CON
   }
 });
 
-test('getClaudeCodeVersion refreshes when the Claude binary mtime changes', async () => {
+test('getClaudeCodeVersion refreshes when the Claude binary mtime changes', { concurrency: false }, async () => {
   const tempHome = await mkdtemp(path.join(tmpdir(), 'claude-hud-version-invalidate-'));
   const customConfigDir = path.join(tempHome, '.claude-alt');
   const binaryPath = path.join(tempHome, 'claude');
@@ -157,7 +157,7 @@ test('getClaudeCodeVersion refreshes when the Claude binary mtime changes', asyn
   }
 });
 
-test('getClaudeCodeVersion executes the resolved binary path', async () => {
+test('getClaudeCodeVersion executes the resolved binary path', { concurrency: false }, async () => {
   const tempHome = await mkdtemp(path.join(tmpdir(), 'claude-hud-version-windows-'));
   const customConfigDir = path.join(tempHome, '.claude-alt');
   const binaryPath = path.join(tempHome, 'claude.cmd');
@@ -189,7 +189,7 @@ test('getClaudeCodeVersion executes the resolved binary path', async () => {
   }
 });
 
-test('getClaudeCodeVersion uses the Windows wrapper invocation for .cmd binaries', async () => {
+test('getClaudeCodeVersion uses the Windows wrapper invocation for .cmd binaries', { concurrency: false }, async () => {
   const tempHome = await mkdtemp(path.join(tmpdir(), 'claude-hud-version-wrapper-'));
   const customConfigDir = path.join(tempHome, '.claude-alt');
   const binaryPath = path.join(tempHome, 'claude.cmd');

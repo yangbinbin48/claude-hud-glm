@@ -8,6 +8,7 @@ import { parseExtraCmdArg, runExtraCmd } from "./extra-cmd.js";
 import { getClaudeCodeVersion } from "./version.js";
 import { getMemoryUsage } from "./memory.js";
 import { setLanguage, t } from "./i18n/index.js";
+import { getGlmUsage } from './glm-usage.js';
 import { fileURLToPath } from "node:url";
 import { realpathSync } from "node:fs";
 export async function main(overrides = {}) {
@@ -22,6 +23,7 @@ export async function main(overrides = {}) {
         runExtraCmd,
         getClaudeCodeVersion,
         getMemoryUsage,
+        getGlmUsage,
         render,
         now: () => Date.now(),
         log: console.log,
@@ -62,6 +64,10 @@ export async function main(overrides = {}) {
         const memoryUsage = config.display.showMemoryUsage && config.lineLayout === "expanded"
             ? await deps.getMemoryUsage()
             : null;
+        // GLM usage (fetched from GLM API when detected)
+        const glmUsage = (config.display.showGlmTokenUsage !== false || config.display.showGlmMcpUsage !== false)
+            ? await deps.getGlmUsage()
+            : null;
         const ctx = {
             stdin,
             transcript,
@@ -72,6 +78,7 @@ export async function main(overrides = {}) {
             sessionDuration,
             gitStatus,
             usageData,
+            glmUsage,
             memoryUsage,
             config,
             extraLabel,

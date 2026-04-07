@@ -3,11 +3,16 @@ import { getProviderLabel } from "../../stdin.js";
 import { critical, label, getQuotaColor, quotaBar, RESET } from "../colors.js";
 import { getAdaptiveBarWidth } from "../../utils/terminal.js";
 import { t } from "../../i18n/index.js";
+import { formatGlmUsageParts } from '../glm-usage.js';
 export function renderUsageLine(ctx) {
     const display = ctx.config?.display;
     const colors = ctx.config?.colors;
     if (display?.showUsage === false) {
         return null;
+    }
+    // GLM usage takes priority when detected
+    if (ctx.glmUsage?.isGlm) {
+        return renderGlmUsage(ctx);
     }
     if (!ctx.usageData) {
         return null;
@@ -107,5 +112,20 @@ function formatResetTime(resetAt) {
         return `${days}d`;
     }
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+}
+function renderGlmUsage(ctx) {
+    const display = ctx.config?.display;
+    const colors = ctx.config?.colors;
+    const glm = ctx.glmUsage;
+    const barWidth = getAdaptiveBarWidth();
+    const parts = formatGlmUsageParts({
+        glm,
+        colors,
+        barWidth,
+        usageBarEnabled: true,
+        showGlmTokenUsage: display?.showGlmTokenUsage !== false,
+        showGlmMcpUsage: display?.showGlmMcpUsage !== false,
+    });
+    return parts.length > 0 ? `${label('GLM', colors)} │ ${parts.join(' │ ')}` : null;
 }
 //# sourceMappingURL=usage.js.map

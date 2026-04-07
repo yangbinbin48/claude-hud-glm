@@ -310,14 +310,16 @@ function renderExpanded(ctx, terminalWidth = null) {
     const elementOrder = ctx.config?.elementOrder ?? DEFAULT_ELEMENT_ORDER;
     const seen = new Set();
     const lines = [];
+    const shouldKeepUsageSeparate = !!ctx.glmUsage?.isGlm;
     for (let index = 0; index < elementOrder.length; index += 1) {
         const element = elementOrder[index];
         if (seen.has(element)) {
             continue;
         }
         const nextElement = elementOrder[index + 1];
-        if ((element === 'context' && nextElement === 'usage' && !seen.has('usage'))
-            || (element === 'usage' && nextElement === 'context' && !seen.has('context'))) {
+        if (!shouldKeepUsageSeparate
+            && ((element === 'context' && nextElement === 'usage' && !seen.has('usage'))
+                || (element === 'usage' && nextElement === 'context' && !seen.has('context')))) {
             seen.add(element);
             seen.add(nextElement);
             const firstLine = renderElementLine(ctx, element);

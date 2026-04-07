@@ -88,6 +88,16 @@ Save as `language: "en"` or `language: "zh"`.
 **Note:** If preset has all items ON (Full), Q5 shows "Nothing to enable - Full preset has everything!"
 If preset has all items OFF (Minimal), Q4 shows "Nothing to disable - Minimal preset is already minimal!"
 
+### Q5: GLM Usage (standalone — always shown, only 2 options)
+- header: "GLM Usage"
+- question: "Show GLM subscription usage metrics? (only visible when ANTHROPIC_BASE_URL points to GLM: open.bigmodel.cn / dev.bigmodel.cn / api.z.ai)"
+- multiSelect: true
+- options:
+  - "GLM Token usage" - 5h Token usage percentage bar
+  - "GLM MCP usage" - MCP call count usage with current/total
+
+Default: both enabled. Map to `display.showGlmTokenUsage` and `display.showGlmMcpUsage`.
+
 ### Q6: Custom Line (optional)
 - header: "Custom Line"
 - question: "Add a custom phrase to display in the HUD? (e.g. a motto, max 80 chars)"
@@ -181,6 +191,16 @@ If user chooses "中文", save `language: "zh"`.
 If user chooses "Enter custom text", use AskUserQuestion to get their text. Save as `display.customLine` in config.
 If user chooses "Remove", set `display.customLine` to `""` in config.
 
+### Q6: GLM Usage (standalone — always shown, only 2 options)
+- header: "GLM Usage"
+- question: "Show GLM subscription usage metrics? (only visible when ANTHROPIC_BASE_URL points to GLM: open.bigmodel.cn / dev.bigmodel.cn / api.z.ai)"
+- multiSelect: true
+- options:
+  - "GLM Token usage" - 5h Token usage percentage bar
+  - "GLM MCP usage" - MCP call count usage with current/total
+
+Default: both enabled. Map to `display.showGlmTokenUsage` and `display.showGlmMcpUsage`.
+
 ---
 
 ## Preset Definitions
@@ -188,16 +208,19 @@ If user chooses "Remove", set `display.customLine` to `""` in config.
 **Full** (everything ON):
 - Activity: Tools ON, Agents ON, Todos ON
 - Info: Counts ON, Tokens ON, Usage ON, Duration ON, Session Name ON, Session Tokens ON
+- GLM: GLM Token usage ON, GLM MCP usage ON
 - Git: ON (with dirty indicator, no ahead/behind)
 
 **Essential** (activity + git):
 - Activity: Tools ON, Agents ON, Todos ON
 - Info: Counts OFF, Tokens OFF, Usage OFF, Duration ON, Session Name OFF, Session Tokens OFF
+- GLM: GLM Token usage ON, GLM MCP usage ON
 - Git: ON (with dirty indicator)
 
 **Minimal** (core only — this is the default):
 - Activity: Tools OFF, Agents OFF, Todos OFF
 - Info: Counts OFF, Tokens OFF, Usage OFF, Duration OFF, Session Name OFF, Session Tokens OFF
+- GLM: GLM Token usage ON, GLM MCP usage ON
 - Git: ON (with dirty indicator)
 
 ---
@@ -249,6 +272,8 @@ If user chooses "Remove", set `display.customLine` to `""` in config.
 | Session name | `display.showSessionName` |
 | Session duration | `display.showDuration` |
 | Session tokens | `display.showSessionTokens` |
+| GLM Token usage | `display.showGlmTokenUsage` |
+| GLM MCP usage | `display.showGlmMcpUsage` |
 | Custom line | `display.customLine` |
 
 **Always true (not configurable):**

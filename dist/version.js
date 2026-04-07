@@ -37,11 +37,19 @@ function statResolvedBinary(binaryPath) {
         }
         return {
             path: realPath,
-            mtimeMs: stat.mtimeMs,
+            mtimeMs: Math.trunc(stat.mtimeMs),
         };
     }
     catch {
         return null;
+    }
+}
+function normalizeBinaryPath(binaryPath) {
+    try {
+        return fs.realpathSync(binaryPath);
+    }
+    catch {
+        return binaryPath;
     }
 }
 function readVersionCache(homeDir) {

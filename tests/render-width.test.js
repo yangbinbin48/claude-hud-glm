@@ -24,6 +24,7 @@ function baseContext() {
     sessionDuration: '',
     gitStatus: null,
     usageData: null,
+    glmUsage: null,
     config: {
       lineLayout: 'compact',
       showSeparators: false,

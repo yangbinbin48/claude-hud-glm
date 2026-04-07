@@ -8,6 +8,7 @@ import { parseExtraCmdArg, runExtraCmd } from "./extra-cmd.js";
 import { getClaudeCodeVersion } from "./version.js";
 import { getMemoryUsage } from "./memory.js";
 import { setLanguage, t } from "./i18n/index.js";
+import { getGlmUsage } from './glm-usage.js';
 import type { RenderContext } from "./types.js";
 import { fileURLToPath } from "node:url";
 import { realpathSync } from "node:fs";
@@ -23,6 +24,7 @@ export type MainDeps = {
   runExtraCmd: typeof runExtraCmd;
   getClaudeCodeVersion: typeof getClaudeCodeVersion;
   getMemoryUsage: typeof getMemoryUsage;
+  getGlmUsage: typeof getGlmUsage;
   render: typeof render;
   now: () => number;
   log: (...args: unknown[]) => void;
@@ -40,6 +42,7 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
     runExtraCmd,
     getClaudeCodeVersion,
     getMemoryUsage,
+    getGlmUsage,
     render,
     now: () => Date.now(),
     log: console.log,
@@ -94,6 +97,11 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
         ? await deps.getMemoryUsage()
         : null;
 
+    // GLM usage (fetched from GLM API when detected)
+    const glmUsage = (config.display.showGlmTokenUsage !== false || config.display.showGlmMcpUsage !== false)
+      ? await deps.getGlmUsage()
+      : null;
+
     const ctx: RenderContext = {
       stdin,
       transcript,
@@ -104,6 +112,7 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
       sessionDuration,
       gitStatus,
       usageData,
+      glmUsage,
       memoryUsage,
       config,
       extraLabel,

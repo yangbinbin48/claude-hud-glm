@@ -2,9 +2,6 @@
 node_modules/
 
 # Build artifacts
-# dist/ is gitignored but exists on main - CI builds and commits it after each merge.
-# See .github/workflows/build-dist.yml
-dist/
 *.tsbuildinfo
 
 # Logs
@@ -53,6 +50,12 @@ coverage/
 tmp/
 temp/
 *.tmp
+transcript-cache/
+
+# User config and cache
+config.json
+glm-cache.json
+config-cache/
 
 # Lock files (keep package-lock.json for npm)
 yarn.lock
