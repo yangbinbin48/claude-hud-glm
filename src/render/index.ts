@@ -13,6 +13,7 @@ import {
   renderUsageLine,
   renderMemoryLine,
   renderSessionTokensLine,
+  renderBurnRateLine,
 } from './lines/index.js';
 import { dim, RESET } from './colors.js';
 import { UNKNOWN_TERMINAL_WIDTH } from '../utils/terminal.js';
@@ -456,6 +457,14 @@ export function render(ctx: RenderContext): void {
       const sessionTokensLine = renderSessionTokensLine(ctx);
       if (sessionTokensLine) {
         lines.push(sessionTokensLine);
+      }
+    }
+
+    // Burn rate (session-level consumption rates)
+    if (ctx.config?.display?.showBurnRate) {
+      const burnRateLine = renderBurnRateLine(ctx);
+      if (burnRateLine) {
+        lines.push(burnRateLine);
       }
     }
 
