@@ -14,7 +14,7 @@ expand
 ## 安装
 ```
 # 添加市场
-claude plugin marketplace add sandxin/claude-hud
+claude plugin marketplace add yangbinbin48/claude-hud-glm
 # 安装插件
 claude plugin install claude-hud
 ```
