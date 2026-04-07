@@ -14,6 +14,7 @@ import { renderMemoryLine } from '../dist/render/lines/memory.js';
 import { renderIdentityLine } from '../dist/render/lines/identity.js';
 import { renderEnvironmentLine } from '../dist/render/lines/environment.js';
 import { renderSessionTokensLine } from '../dist/render/lines/session-tokens.js';
+import { renderBurnRateLine } from '../dist/render/lines/burn-rate.js';
 import { getContextColor, getQuotaColor } from '../dist/render/colors.js';
 import { setLanguage } from '../dist/i18n/index.js';
 
@@ -51,7 +52,7 @@ function baseContext() {
       pathLevels: 1,
       elementOrder: ['project', 'context', 'usage', 'memory', 'environment', 'tools', 'agents', 'todos'],
       gitStatus: { enabled: true, showDirty: true, showAheadBehind: false, showFileStats: false, pushWarningThreshold: 0, pushCriticalThreshold: 0 },
-      display: { showModel: true, showProject: true, showContextBar: true, contextValue: 'percent', showConfigCounts: true, showCost: false, showDuration: true, showSpeed: false, showTokenBreakdown: true, showUsage: true, usageBarEnabled: false, showTools: true, showAgents: true, showTodos: true, showSessionTokens: false, showSessionName: false, showClaudeCodeVersion: false, showMemoryUsage: false, showOutputStyle: false, autocompactBuffer: 'enabled', usageThreshold: 0, sevenDayThreshold: 80, environmentThreshold: 0, customLine: '' },
+      display: { showModel: true, showProject: true, showContextBar: true, contextValue: 'percent', showConfigCounts: true, showCost: false, showDuration: true, showSpeed: false, showTokenBreakdown: true, showUsage: true, usageBarEnabled: false, showTools: true, showAgents: true, showTodos: true, showSessionTokens: false, showSessionName: false, showClaudeCodeVersion: false, showMemoryUsage: false, showOutputStyle: false, showGlmTokenUsage: true, showGlmMcpUsage: true, showBurnRate: false, burnRateWindow: 5, autocompactBuffer: 'enabled', usageThreshold: 0, sevenDayThreshold: 80, environmentThreshold: 0, modelFormat: 'full', modelOverride: '', customLine: '' },
       colors: {
         context: 'green',
         usage: 'brightBlue',
@@ -1930,4 +1931,78 @@ test('renderSessionLine includes compact session token summary when enabled', ()
 
   const line = stripAnsi(renderSessionLine(ctx));
   assert.ok(line.includes('tok: 2k (in: 2k, out: 250)'), 'should include compact token summary');
+});
+
+// Burn Rate tests
+test('renderBurnRateLine returns null when showBurnRate is false', () => {
+  const ctx = baseContext();
+  ctx.config.display.showBurnRate = false;
+  ctx.transcript.sessionStart = new Date(Date.now() - 5 * 60 * 1000);
+  assert.equal(renderBurnRateLine(ctx), null);
+});
+
+test('renderBurnRateLine returns null when session is too short', () => {
+  const ctx = baseContext();
+  ctx.config.display.showBurnRate = true;
+  ctx.transcript.sessionStart = new Date(Date.now() - 30 * 1000);
+  assert.equal(renderBurnRateLine(ctx), null);
+});
+
+test('renderBurnRateLine returns null for Bedrock users', () => {
+  const ctx = baseContext();
+  ctx.config.display.showBurnRate = true;
+  ctx.stdin.model = { id: 'anthropic.claude-sonnet-4-20250514-v1:0', display_name: 'Sonnet' };
+  ctx.transcript.sessionStart = new Date(Date.now() - 5 * 60 * 1000);
+  assert.equal(renderBurnRateLine(ctx), null);
+});
+
+test('renderBurnRateLine returns null for GLM users', () => {
+  const ctx = baseContext();
+  ctx.config.display.showBurnRate = true;
+  ctx.glmUsage = { isGlm: true, tokensPercent: 50, mcpPercent: 10, mcpCurrentUsage: null, mcpTotal: null, tokenResetAt: null, mcpResetAt: null, fetchedAt: Date.now() };
+  ctx.transcript.sessionStart = new Date(Date.now() - 5 * 60 * 1000);
+  assert.equal(renderBurnRateLine(ctx), null);
+});
+
+test('renderBurnRateLine shows FULL when fiveHour is at 100%', () => {
+  const ctx = baseContext();
+  ctx.config.display.showBurnRate = true;
+  ctx.stdin.context_window = { current_usage: { input_tokens: 0 }, context_window_size: 200000 };
+  ctx.transcript.sessionStart = new Date(Date.now() - 5 * 60 * 1000);
+  ctx.usageData = { fiveHour: 100, sevenDay: null, fiveHourResetAt: null, sevenDayResetAt: null };
+
+  const line = stripAnsi(renderBurnRateLine(ctx) ?? '');
+  assert.ok(line.includes('5h'), 'should include 5h label');
+  assert.ok(line.includes('FULL'), 'should show FULL when fiveHour at 100%');
+  assert.ok(!line.includes('5h') || !line.split('5h')[1]?.includes('ETA'), '5h section should not have ETA when full');
+});
+
+test('renderBurnRateLine shows context burn rate with ETA', () => {
+  const ctx = baseContext();
+  ctx.config.display.showBurnRate = true;
+  ctx.stdin.context_window = { context_window_size: 200000, current_usage: { input_tokens: 40000 } };
+  ctx.transcript.sessionStart = new Date(Date.now() - 5 * 60 * 1000);
+
+  const line = stripAnsi(renderBurnRateLine(ctx) ?? '');
+  assert.ok(line.includes('Burn'), 'should include burn label');
+  assert.ok(line.includes('ctx'), 'should include ctx label');
+  assert.ok(line.includes('ETA'), 'should include ETA');
+});
+
+test('renderBurnRateLine shows usage and token rates together', () => {
+  const ctx = baseContext();
+  ctx.config.display.showBurnRate = true;
+  ctx.stdin.context_window = { context_window_size: 200000, current_usage: { input_tokens: 40000 } };
+  ctx.transcript.sessionStart = new Date(Date.now() - 10 * 60 * 1000);
+  ctx.usageData = { fiveHour: 30, sevenDay: null, fiveHourResetAt: null, sevenDayResetAt: null };
+  ctx.transcript.tokenSamplePoints = [
+    { timestamp: new Date(Date.now() - 10 * 60 * 1000), cumulativeInputTokens: 0, cumulativeOutputTokens: 0 },
+    { timestamp: new Date(Date.now() - 5 * 60 * 1000), cumulativeInputTokens: 2000, cumulativeOutputTokens: 500 },
+    { timestamp: new Date(Date.now() - 1 * 60 * 1000), cumulativeInputTokens: 10000, cumulativeOutputTokens: 3000 },
+  ];
+
+  const line = stripAnsi(renderBurnRateLine(ctx) ?? '');
+  assert.ok(line.includes('Burn'), 'should include burn label');
+  assert.ok(line.includes('5h'), 'should include 5h usage');
+  assert.ok(line.includes('tok/m'), 'should include token rate');
 });

@@ -10,10 +10,14 @@ export const en: Messages = {
   "label.hooks": "hooks",
   "label.estimatedCost": "Est.",
   "label.cost": "Cost",
+  "label.burnRate": "Burn",
+  "label.ctx": "ctx",
+  "label.recent": "recent",
 
   // Status
   "status.limitReached": "Limit reached",
   "status.allTodosComplete": "All todos complete",
+  "status.full": "FULL",
 
   // Format
   "format.resets": "resets",
@@ -22,6 +26,9 @@ export const en: Messages = {
   "format.cache": "cache",
   "format.out": "out",
   "format.tokPerSec": "tok/s",
+  "format.perMin": "%/m",
+  "format.eta": "ETA",
+  "format.tokPerMin": "tok/m",
 
   // Init
   "init.initializing": "[claude-hud] Initializing...",

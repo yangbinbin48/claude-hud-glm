@@ -94,6 +94,8 @@ export interface HudConfig {
     showOutputStyle: boolean;
     showGlmTokenUsage: boolean;
     showGlmMcpUsage: boolean;
+    showBurnRate: boolean;
+    burnRateWindow: number;
     autocompactBuffer: AutocompactBufferMode;
     usageThreshold: number;
     sevenDayThreshold: number;
@@ -141,6 +143,8 @@ export const DEFAULT_CONFIG: HudConfig = {
     showOutputStyle: false,
     showGlmTokenUsage: true,
     showGlmMcpUsage: true,
+    showBurnRate: false,
+    burnRateWindow: 5,
     autocompactBuffer: 'enabled',
     usageThreshold: 0,
     sevenDayThreshold: 80,
@@ -381,6 +385,13 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     showGlmMcpUsage: typeof migrated.display?.showGlmMcpUsage === 'boolean'
       ? migrated.display.showGlmMcpUsage
       : DEFAULT_CONFIG.display.showGlmMcpUsage,
+    showBurnRate: typeof migrated.display?.showBurnRate === 'boolean'
+      ? migrated.display.showBurnRate
+      : DEFAULT_CONFIG.display.showBurnRate,
+    burnRateWindow: typeof migrated.display?.burnRateWindow === 'number'
+      && Number.isFinite(migrated.display.burnRateWindow) && migrated.display.burnRateWindow >= 1
+      ? Math.floor(migrated.display.burnRateWindow)
+      : DEFAULT_CONFIG.display.burnRateWindow,
     autocompactBuffer: validateAutocompactBuffer(migrated.display?.autocompactBuffer)
       ? migrated.display.autocompactBuffer
       : DEFAULT_CONFIG.display.autocompactBuffer,

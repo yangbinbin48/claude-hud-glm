@@ -10,10 +10,14 @@ export const zh: Messages = {
   "label.hooks": "钩子",
   "label.estimatedCost": "估算",
   "label.cost": "费用",
+  "label.burnRate": "消耗",
+  "label.ctx": "上下文",
+  "label.recent": "近期",
 
   // Status
   "status.limitReached": "已达上限",
   "status.allTodosComplete": "全部完成",
+  "status.full": "已满",
 
   // Format
   "format.resets": "重置于",
@@ -22,6 +26,9 @@ export const zh: Messages = {
   "format.cache": "缓存",
   "format.out": "输出",
   "format.tokPerSec": "tok/s",
+  "format.perMin": "%/分",
+  "format.eta": "预计",
+  "format.tokPerMin": "tok/分",
 
   // Init
   "init.initializing": "[claude-hud] 正在初始化...",

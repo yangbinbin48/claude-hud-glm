@@ -8,9 +8,13 @@ export type MessageKey =
   | "label.hooks"
   | "label.estimatedCost"
   | "label.cost"
+  | "label.burnRate"
+  | "label.ctx"
+  | "label.recent"
   // Status
   | "status.limitReached"
   | "status.allTodosComplete"
+  | "status.full"
   // Format
   | "format.resets"
   | "format.resetsIn"
@@ -18,6 +22,9 @@ export type MessageKey =
   | "format.cache"
   | "format.out"
   | "format.tokPerSec"
+  | "format.perMin"
+  | "format.eta"
+  | "format.tokPerMin"
   // Init
   | "init.initializing"
   | "init.macosNote";
