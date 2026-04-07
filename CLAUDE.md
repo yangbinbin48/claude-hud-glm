@@ -67,6 +67,7 @@ src/
 ├── config-reader.ts   # Read MCP/rules configs
 ├── config.ts          # Load/validate user config
 ├── git.ts             # Git status (branch, dirty, ahead/behind)
+├── burn-rate.ts       # Burn rate calculation (context/usage/token rates)
 ├── types.ts           # TypeScript interfaces
 └── render/
     ├── index.ts       # Main render coordinator
@@ -95,6 +96,7 @@ Lines 1-2 always shown. Additional lines are opt-in via config:
 - Agents line (`showAgents`): ◐ explore [haiku]: Finding auth code
 - Todos line (`showTodos`): ▸ Fix authentication bug (2/5)
 - Environment line (`showConfigCounts`): 2 CLAUDE.md | 4 rules
+- Burn Rate line (`showBurnRate`): Burn +2.3%/m ctx (ETA 42m) │ +0.8%/m 5h (ETA 2h) │ 15k tok/m
 
 ### Context Thresholds
 
