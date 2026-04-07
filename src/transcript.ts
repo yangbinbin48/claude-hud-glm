@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import * as readline from 'readline';
 import { createHash } from 'node:crypto';
 import { getHudPluginDir } from './claude-config-dir.js';
-import type { TranscriptData, ToolEntry, AgentEntry, TodoItem, SessionTokenUsage } from './types.js';
+import type { TranscriptData, ToolEntry, AgentEntry, TodoItem, SessionTokenUsage, TokenSamplePoint } from './types.js';
 
 interface TranscriptLine {
   timestamp?: string;
@@ -46,6 +46,12 @@ interface SerializedAgentEntry extends Omit<AgentEntry, 'startTime' | 'endTime'>
   endTime?: string;
 }
 
+interface SerializedSamplePoint {
+  timestamp: string;
+  cumulativeInputTokens: number;
+  cumulativeOutputTokens: number;
+}
+
 interface SerializedTranscriptData {
   tools: SerializedToolEntry[];
   agents: SerializedAgentEntry[];
@@ -53,6 +59,7 @@ interface SerializedTranscriptData {
   sessionStart?: string;
   sessionName?: string;
   sessionTokens?: SessionTokenUsage;
+  tokenSamplePoints?: SerializedSamplePoint[];
 }
 
 interface TranscriptCacheFile {
@@ -121,6 +128,11 @@ function serializeTranscriptData(data: TranscriptData): SerializedTranscriptData
     sessionStart: data.sessionStart?.toISOString(),
     sessionName: data.sessionName,
     sessionTokens: data.sessionTokens,
+    tokenSamplePoints: data.tokenSamplePoints?.map(p => ({
+      timestamp: p.timestamp.toISOString(),
+      cumulativeInputTokens: p.cumulativeInputTokens,
+      cumulativeOutputTokens: p.cumulativeOutputTokens,
+    })),
   };
 }
 
@@ -140,6 +152,11 @@ function deserializeTranscriptData(data: SerializedTranscriptData): TranscriptDa
     sessionStart: data.sessionStart ? new Date(data.sessionStart) : undefined,
     sessionName: data.sessionName,
     sessionTokens: normalizeSessionTokens(data.sessionTokens),
+    tokenSamplePoints: data.tokenSamplePoints?.map(p => ({
+      timestamp: new Date(p.timestamp),
+      cumulativeInputTokens: p.cumulativeInputTokens,
+      cumulativeOutputTokens: p.cumulativeOutputTokens,
+    })),
   };
 }
 
@@ -210,6 +227,7 @@ export async function parseTranscript(transcriptPath: string): Promise<Transcrip
     cacheCreationTokens: 0,
     cacheReadTokens: 0,
   };
+  const tokenSamplePoints: TokenSamplePoint[] = [];
 
   let parsedCleanly = false;
 
@@ -237,6 +255,12 @@ export async function parseTranscript(transcriptPath: string): Promise<Transcrip
           sessionTokens.outputTokens += normalizeTokenCount(usage.output_tokens);
           sessionTokens.cacheCreationTokens += normalizeTokenCount(usage.cache_creation_input_tokens);
           sessionTokens.cacheReadTokens += normalizeTokenCount(usage.cache_read_input_tokens);
+
+          tokenSamplePoints.push({
+            timestamp: entry.timestamp ? new Date(entry.timestamp) : new Date(),
+            cumulativeInputTokens: sessionTokens.inputTokens,
+            cumulativeOutputTokens: sessionTokens.outputTokens,
+          });
         }
         processEntry(entry, toolMap, agentMap, taskIdToIndex, latestTodos, result);
       } catch {
@@ -254,6 +278,7 @@ export async function parseTranscript(transcriptPath: string): Promise<Transcrip
   result.todos = latestTodos;
   result.sessionName = customTitle ?? latestSlug;
   result.sessionTokens = sessionTokens;
+  result.tokenSamplePoints = tokenSamplePoints.slice(-200);
   if (parsedCleanly) {
     writeTranscriptCache(transcriptPath, transcriptState, result);
   }

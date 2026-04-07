@@ -100,6 +100,12 @@ export interface SessionTokenUsage {
   cacheReadTokens: number;
 }
 
+export interface TokenSamplePoint {
+  timestamp: Date;
+  cumulativeInputTokens: number;
+  cumulativeOutputTokens: number;
+}
+
 export interface TranscriptData {
   tools: ToolEntry[];
   agents: AgentEntry[];
@@ -107,6 +113,7 @@ export interface TranscriptData {
   sessionStart?: Date;
   sessionName?: string;
   sessionTokens?: SessionTokenUsage;
+  tokenSamplePoints?: TokenSamplePoint[];
 }
 
 export interface RenderContext {
