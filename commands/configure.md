@@ -77,6 +77,7 @@ Save as `language: "en"` or `language: "zh"`.
   - "Session duration" - ⏱️ 5m
   - "Session name" - fix-auth-bug (session slug or custom title)
   - "Session tokens" - Tokens 12.8M (in: 7k, out: 28k, cache: 12.8M)
+  - "Burn rate" - Burn +2.3%/m ctx (ETA 42m) │ +0.8%/m 5h │ 15k tok/m
 
 ### Q5: Turn On (based on chosen preset)
 - header: "Turn On"
@@ -124,6 +125,7 @@ If user chooses "Enter custom text", use AskUserQuestion to get their text. Save
   - "Git status" - git:(main*) branch indicator
   - "Session name" - fix-auth-bug (session slug or custom title)
   - "Session tokens" - Tokens 12.8M (in: 7k, out: 28k, cache: 12.8M)
+  - "Burn rate" - Burn +2.3%/m ctx (ETA 42m) │ +0.8%/m 5h │ 15k tok/m
   - "Usage bar style" - ██░░ 25% visual bar (only if usageBarEnabled is true)
 
 If more than 4 items ON, show Activity items (Tools, Agents, Todos, Project, Git) first.
@@ -142,6 +144,7 @@ Info items (Counts, Tokens, Usage, Speed, Duration) can be turned off via "Reset
   - "Session name" - fix-auth-bug (session slug or custom title)
   - "Session tokens" - Tokens 12.8M (in: 7k, out: 28k, cache: 12.8M)
   - "Session duration" - ⏱️ 5m
+  - "Burn rate" - Burn +2.3%/m ctx (ETA 42m) │ +0.8%/m 5h │ 15k tok/m
 
 ### Q3: Git Style (only if Git is currently enabled)
 - header: "Git Style"
@@ -207,19 +210,19 @@ Default: both enabled. Map to `display.showGlmTokenUsage` and `display.showGlmMc
 
 **Full** (everything ON):
 - Activity: Tools ON, Agents ON, Todos ON
-- Info: Counts ON, Tokens ON, Usage ON, Duration ON, Session Name ON, Session Tokens ON
+- Info: Counts ON, Tokens ON, Usage ON, Duration ON, Session Name ON, Session Tokens ON, Burn Rate ON
 - GLM: GLM Token usage ON, GLM MCP usage ON
 - Git: ON (with dirty indicator, no ahead/behind)
 
 **Essential** (activity + git):
 - Activity: Tools ON, Agents ON, Todos ON
-- Info: Counts OFF, Tokens OFF, Usage OFF, Duration ON, Session Name OFF, Session Tokens OFF
+- Info: Counts OFF, Tokens OFF, Usage OFF, Duration ON, Session Name OFF, Session Tokens OFF, Burn Rate OFF
 - GLM: GLM Token usage ON, GLM MCP usage ON
 - Git: ON (with dirty indicator)
 
 **Minimal** (core only — this is the default):
 - Activity: Tools OFF, Agents OFF, Todos OFF
-- Info: Counts OFF, Tokens OFF, Usage OFF, Duration OFF, Session Name OFF, Session Tokens OFF
+- Info: Counts OFF, Tokens OFF, Usage OFF, Duration OFF, Session Name OFF, Session Tokens OFF, Burn Rate OFF
 - GLM: GLM Token usage ON, GLM MCP usage ON
 - Git: ON (with dirty indicator)
 
@@ -272,6 +275,7 @@ Default: both enabled. Map to `display.showGlmTokenUsage` and `display.showGlmMc
 | Session name | `display.showSessionName` |
 | Session duration | `display.showDuration` |
 | Session tokens | `display.showSessionTokens` |
+| Burn rate | `display.showBurnRate` |
 | GLM Token usage | `display.showGlmTokenUsage` |
 | GLM MCP usage | `display.showGlmMcpUsage` |
 | Custom line | `display.customLine` |
@@ -337,6 +341,7 @@ Changes:
 Context ████░░░░░ 45% │ Usage ██░░░░░░░░ 25% (1h 30m / 5h)
 ◐ Edit: file.ts | ✓ Read ×3
 ▸ Fix auth bug (2/5)
+Burn +2.3%/m ctx (ETA 42m) │ +0.8%/m 5h │ 15k tok/m
 ```
 
 **Preview of HUD (Compact layout):**
@@ -344,6 +349,7 @@ Context ████░░░░░ 45% │ Usage ██░░░░░░░░
 [Opus | Pro] ████░░░░░ 45% | my-project git:(main*) | 5h: 25% | ⏱️ 5m
 ◐ Edit: file.ts | ✓ Read ×3
 ▸ Fix auth bug (2/5)
+Burn +2.3%/m ctx (ETA 42m) │ +0.8%/m 5h │ 15k tok/m
 ```
 
 3. **Confirm**: "Save these changes?"
