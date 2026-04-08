@@ -46,15 +46,21 @@ export function renderBurnRateLine(ctx: RenderContext): string | null {
     return null;
   }
 
-  // Skip for GLM users (they have their own usage system)
+  // GLM users: use GLM token percentage as the 5h usage equivalent
+  let usageDataForBurnRate = ctx.usageData;
   if (ctx.glmUsage?.isGlm) {
-    return null;
+    usageDataForBurnRate = {
+      fiveHour: ctx.glmUsage.tokensPercent,
+      sevenDay: null,
+      fiveHourResetAt: ctx.glmUsage.tokenResetAt,
+      sevenDayResetAt: null,
+    };
   }
 
   const burnRate = calculateBurnRate({
     stdin: ctx.stdin,
     sessionStart: ctx.transcript.sessionStart,
-    usageData: ctx.usageData,
+    usageData: usageDataForBurnRate,
     tokenSamplePoints: ctx.transcript.tokenSamplePoints,
     burnRateWindow: display.burnRateWindow,
   });

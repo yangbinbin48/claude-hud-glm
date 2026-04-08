@@ -1956,12 +1956,18 @@ test('renderBurnRateLine returns null for Bedrock users', () => {
   assert.equal(renderBurnRateLine(ctx), null);
 });
 
-test('renderBurnRateLine returns null for GLM users', () => {
+test('renderBurnRateLine uses GLM token percentage for 5h rate', () => {
   const ctx = baseContext();
   ctx.config.display.showBurnRate = true;
+  ctx.stdin.context_window = { context_window_size: 200000, current_usage: { input_tokens: 40000 } };
   ctx.glmUsage = { isGlm: true, tokensPercent: 50, mcpPercent: 10, mcpCurrentUsage: null, mcpTotal: null, tokenResetAt: null, mcpResetAt: null, fetchedAt: Date.now() };
   ctx.transcript.sessionStart = new Date(Date.now() - 5 * 60 * 1000);
-  assert.equal(renderBurnRateLine(ctx), null);
+
+  const line = stripAnsi(renderBurnRateLine(ctx) ?? '');
+  assert.ok(line.includes('Burn'), 'should include burn label');
+  assert.ok(line.includes('ctx'), 'should include context rate');
+  assert.ok(line.includes('5h'), 'should include 5h rate from GLM token percentage');
+  assert.ok(line.includes('ETA'), 'should include ETA');
 });
 
 test('renderBurnRateLine shows FULL when fiveHour is at 100%', () => {
