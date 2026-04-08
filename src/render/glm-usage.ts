@@ -9,14 +9,18 @@ function formatResetTime(resetAt: Date | null): string {
   if (!resetAt) return '';
   if (Number.isNaN(resetAt.getTime())) return '';
 
-  const now = new Date();
-  const isSameDay = resetAt.getFullYear() === now.getFullYear()
-    && resetAt.getMonth() === now.getMonth()
-    && resetAt.getDate() === now.getDate();
-  const timeText = `${padTwoDigits(resetAt.getHours())}:${padTwoDigits(resetAt.getMinutes())}`;
+  // GLM API timestamps should be displayed in UTC+8 (China Standard Time)
+  const UTC8 = 8 * 3600_000;
+  const d = new Date(resetAt.getTime() + UTC8);
+  const n = new Date(Date.now() + UTC8);
+
+  const isSameDay = d.getUTCFullYear() === n.getUTCFullYear()
+    && d.getUTCMonth() === n.getUTCMonth()
+    && d.getUTCDate() === n.getUTCDate();
+  const timeText = `${padTwoDigits(d.getUTCHours())}:${padTwoDigits(d.getUTCMinutes())}`;
 
   if (isSameDay) return timeText;
-  return `${padTwoDigits(resetAt.getMonth() + 1)}-${padTwoDigits(resetAt.getDate())} ${timeText}`;
+  return `${padTwoDigits(d.getUTCMonth() + 1)}-${padTwoDigits(d.getUTCDate())} ${timeText}`;
 }
 
 export function formatGlmUsageParts({
